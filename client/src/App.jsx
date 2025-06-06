@@ -44,16 +44,17 @@ function App() {
   return (
     <div className="container">
       <h1>Tic-Tac-Toe</h1>
-      <p>{status}</p>
+      <p className="status">{status}</p>
       <div className="board">
         {board.map((cell, i) => (
-          <div
+          <button
             key={i}
-            className="cell"
+            className={`cell ${cell === 'X' ? 'x' : cell === 'O' ? 'o' : ''}`}
             onClick={() => handleClick(i)}
+            disabled={!!cell || isGameOver}
           >
             {cell}
-          </div>
+          </button>
         ))}
       </div>
     </div>

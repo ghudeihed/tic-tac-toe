@@ -1,27 +1,61 @@
-.container {
-  text-align: center;
+body {
   font-family: sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 1rem;
 }
 
 .board {
   display: grid;
-  grid-template-columns: repeat(3, 80px);
-  gap: 5px;
+  grid-template-columns: repeat(3, 100px);
+  gap: 10px;
   justify-content: center;
-  margin-top: 20px;
 }
 
 .cell {
-  width: 80px;
-  height: 80px;
-  font-size: 2rem;
-  background: #ccc;
+  width: 100px;
+  height: 100px;
+  background-color: #fff;
+  border: 2px solid #ccc;
+  font-size: 2.5rem;
+  font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .cell:hover {
-  background: #ddd;
+  background-color: #e6f7ff;
+}
+
+.cell:disabled {
+  cursor: not-allowed;
+  background-color: #f0f0f0;
+}
+
+.cell.x {
+  color: #ff4d4f; /* Red for X */
+}
+
+.cell.o {
+  color: #1890ff; /* Blue for O */
+}
+
+.status {
+  font-size: 1.4rem;
+  margin-top: 1rem;
+  color: #222;
+  font-weight: 500;
+  text-align: center;
 }
