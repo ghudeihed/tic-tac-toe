@@ -11,7 +11,7 @@ function App() {
   const handleClick = async (index) => {
     if (board[index] || isGameOver) return;
 
-    const response = await fetch('http://localhost:5000/move', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/move`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ board, index }),
