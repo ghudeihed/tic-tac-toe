@@ -35,6 +35,11 @@ python main.py
 
 Server will run at: `http://localhost:5000`
 
+Run the tests
+```bash
+cd server
+PYTHONPATH=. pytest --cov=.
+```
 ---
 
 ### 2. Frontend (React + Vite)
