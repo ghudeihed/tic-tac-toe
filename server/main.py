@@ -16,6 +16,20 @@ def check_winner(board, player):
 def is_draw(board):
     return all(cell is not None for cell in board)
 
+def get_computer_move(board):
+    # Prioritize center
+    if board[4] is None:
+        return 4
+    # Prioritize corners
+    for i in [0, 2, 6, 8]:
+        if board[i] is None:
+            return i
+    # Then sides
+    for i in [1, 3, 5, 7]:
+        if board[i] is None:
+            return i
+    return None 
+
 @app.route("/ping", methods=["GET"])
 def ping():
     return jsonify({"message": "pong"})
@@ -37,11 +51,9 @@ def move():
     if is_draw(board):
         return jsonify({"board": board, "status": "draw"})
 
-    # Basic move
-    for i in range(9):
-        if board[i] is None:
-            board[i] = 'O'
-            break
+    comp_move = get_computer_move(board)
+    if comp_move is not None:
+        board[comp_move] = 'O'
 
     if check_winner(board, 'O'):
         return jsonify({"board": board, "status": "O_wins"})
