@@ -45,6 +45,7 @@ PYTHONPATH=. pytest --cov=.
 ### 2. Frontend (React + Vite)
 
 ```bash
+npm create vite@latest client -- --template react
 cd client
 npm install
 npm run dev
