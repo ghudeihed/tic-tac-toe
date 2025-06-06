@@ -59,3 +59,24 @@ h1 {
   font-weight: 500;
   text-align: center;
 }
+
+.new-game-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  background-color: #007bff; /* Bootstrap blue */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.new-game-btn:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.new-game-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+}

@@ -21,24 +21,21 @@ function App() {
     setBoard(data.board);
     setStatus(prettyStatus(data.status));
     if (data.status !== 'in_progress') setIsGameOver(true);
-
-    // Auto-reset board after 2s if game is over
-    if (data.status !== 'in_progress') {
-      setTimeout(() => {
-        setBoard(initialBoard);
-        setStatus('Your move');
-        setIsGameOver(false);
-      }, 2000);
-    }
   };
 
   const prettyStatus = (s) => {
     switch (s) {
       case 'X_wins': return 'You win!';
       case 'O_wins': return 'Computer wins!';
-      case 'draw': return 'It\'s a draw!';
+      case 'draw': return "It's a draw!";
       default: return 'Your move';
     }
+  };
+
+  const resetGame = () => {
+    setBoard(initialBoard);
+    setStatus('Your move');
+    setIsGameOver(false);
   };
 
   return (
@@ -57,6 +54,11 @@ function App() {
           </button>
         ))}
       </div>
+      {isGameOver && (
+        <button className="new-game-btn" onClick={resetGame}>
+          New Game
+        </button>
+      )}
     </div>
   );
 }
