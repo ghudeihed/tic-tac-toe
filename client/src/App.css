@@ -80,3 +80,62 @@ h1 {
   outline: none;
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
 }
+
+/* Error message styling */
+.error-message {
+  background-color: #fee;
+  color: #c33;
+  padding: 12px;
+  border: 1px solid #fcc;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Loading state styling */
+.status.loading {
+  color: #666;
+  font-style: italic;
+}
+
+.cell.loading {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* Loading animation for cells */
+.cell.loading:hover {
+  background-color: #f0f0f0;
+  transform: none;
+}
+
+/* Disable hover effects when loading */
+.board.loading .cell:hover {
+  background-color: #fff;
+  transform: none;
+}
+
+/* Button loading state */
+.new-game-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Optional: Add a subtle loading spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #333;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
