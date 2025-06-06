@@ -1,47 +1,60 @@
 import { useState } from 'react';
 import './App.css';
 
-const EMPTY_BOARD = Array(9).fill(null);
+const initialBoard = Array(9).fill(null);
 
 function App() {
-  const [board, setBoard] = useState(EMPTY_BOARD);
-  const [status, setStatus] = useState("Your turn");
+  const [board, setBoard] = useState(initialBoard);
+  const [status, setStatus] = useState('Your move');
+  const [isGameOver, setIsGameOver] = useState(false);
 
   const handleClick = async (index) => {
-    if (board[index] !== null) return;
+    if (board[index] || isGameOver) return;
 
-    try {
-      const response = await fetch("http://localhost:5000/move", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ board, index }),
-      });
+    const response = await fetch('http://localhost:5000/move', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ board, index }),
+    });
 
-      const data = await response.json();
-      if (data.board) {
-        setBoard(data.board);
-        setStatus("Your turn"); // Will improve later to show win/draw
-      } else if (data.error) {
-        setStatus("Invalid move.");
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      setStatus("Server error.");
+    const data = await response.json();
+    setBoard(data.board);
+    setStatus(prettyStatus(data.status));
+    if (data.status !== 'in_progress') setIsGameOver(true);
+
+    // Auto-reset board after 2s if game is over
+    if (data.status !== 'in_progress') {
+      setTimeout(() => {
+        setBoard(initialBoard);
+        setStatus('Your move');
+        setIsGameOver(false);
+      }, 2000);
     }
   };
 
-  const renderCell = (i) => (
-    <div className="cell" onClick={() => handleClick(i)}>
-      {board[i]}
-    </div>
-  );
+  const prettyStatus = (s) => {
+    switch (s) {
+      case 'X_wins': return 'You win!';
+      case 'O_wins': return 'Computer wins!';
+      case 'draw': return 'It\'s a draw!';
+      default: return 'Your move';
+    }
+  };
 
   return (
-    <div className="app">
+    <div className="container">
       <h1>Tic-Tac-Toe</h1>
       <p>{status}</p>
       <div className="board">
-        {board.map((_, i) => renderCell(i))}
+        {board.map((cell, i) => (
+          <div
+            key={i}
+            className="cell"
+            onClick={() => handleClick(i)}
+          >
+            {cell}
+          </div>
+        ))}
       </div>
     </div>
   );
