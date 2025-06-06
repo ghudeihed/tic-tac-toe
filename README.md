@@ -31,4 +31,29 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 python main.py
+````
+
+Server will run at: `http://localhost:5000`
+
+---
+
+### 2. Frontend (React + Vite)
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+SPA will run at: `http://localhost:5173`
+
+---
+
+## Project Structure
+
+```
+tic-tac-toe/
+├── client/       # React frontend
+├── server/       # Flask backend logic
+└── README.md
 ```
