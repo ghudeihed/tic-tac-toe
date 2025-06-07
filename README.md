@@ -38,7 +38,7 @@ Server will run at: `http://localhost:5000`
 Run the tests
 ```bash
 cd server
-PYTHONPATH=. pytest --cov=.
+PYTHONPATH=.  pytest  --cov=. tests/
 ```
 ---
 

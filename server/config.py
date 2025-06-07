@@ -1,11 +1,14 @@
 import os
 import logging
 
-# Setup logging
+# Create logs directory if it doesn't exist
+log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+os.makedirs(log_dir, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    filename='app.log',
+    filename=os.path.join(log_dir, 'app.log'),
     filemode='a'
 )
 
@@ -25,13 +28,4 @@ class Config:
                     os.getenv('ALLOWED_ORIGINS', 'http://localhost:5173').split(',')]
     
     DEBUG_MODE = os.getenv('FLASK_ENV', 'production').lower() == 'development'
-    
-    @staticmethod
-    def get_port():
-        try:
-            return int(os.getenv('PORT', 5000))
-        except ValueError:
-            logger.warning("Invalid PORT value, defaulting to 5000")
-            return 5000
-    
-    PORT = get_port.__func__()
+    PORT = int(os.getenv('PORT', 5000))
