@@ -2,7 +2,6 @@ import pytest
 from game import TicTacToeGame
 from config import Config
 
-
 class TestWinDetection:
     """Test cases for win pattern detection."""
     
@@ -196,7 +195,6 @@ class TestGameLogicIntegration:
         assert game.check_winner(board, 'X')
         assert not game.check_winner(board, 'O')
 
-
     def test_computer_move_validity(self, game, sample_boards):
         """Test that computer always chooses valid moves."""
         test_boards = [
@@ -317,3 +315,32 @@ class TestMoveValidation:
         is_valid, error = game.validate_move(board, 1)
         assert is_valid == True
         assert error is None
+
+class TestConfigIntegration:
+    """Test integration with configuration settings."""
+    
+    def test_board_size_from_config(self, game):
+        """Test that game uses board size from config."""
+        assert game.board_size == Config.BOARD_SIZE
+        
+        # Test that methods respect the board size
+        board = [None] * Config.BOARD_SIZE
+        move = game.get_computer_move(board)
+        assert 0 <= move < Config.BOARD_SIZE
+    
+    def test_win_patterns_from_config(self, game):
+        """Test that game uses win patterns from config."""
+        assert game.win_patterns == Config.WIN_PATTERNS
+        
+        # Test that each win pattern works
+        for pattern in Config.WIN_PATTERNS:
+            board = [None] * Config.BOARD_SIZE
+            for pos in pattern:
+                board[pos] = 'X'
+            assert game.check_winner(board, 'X') == True
+    
+    def test_symbol_assignment(self, game):
+        """Test that symbols are correctly assigned."""
+        assert game.computer_symbol == 'O'
+        assert game.human_symbol == 'X'
+        assert game.computer_symbol != game.human_symbol
