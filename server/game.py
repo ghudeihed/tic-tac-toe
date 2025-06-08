@@ -10,11 +10,19 @@ class TicTacToeGame:
     
     def check_winner(self, board: list[Optional[str]], player: str) -> bool:
         """Check if a player has won the game."""
-        return any(all(board[i] == player for i in pattern) for pattern in self.win_patterns)
+        try:
+            return any(all(board[i] == player for i in pattern) for pattern in self.win_patterns)
+        except Exception as e:
+            logger.error(f"Error checking winner: {str(e)}")
+            return False
     
     def is_draw(self, board: list[Optional[str]]) -> bool:
         """Check if the game is a draw."""
-        return all(cell is not None for cell in board)
+        try:
+            return all(cell is not None for cell in board) and not self.check_winner(board, self.computer_symbol) and not self.check_winner(board, self.human_symbol)
+        except TypeError as e:
+            logger.error(f"Error checking draw: {str(e)}")
+            return False
     
     def get_computer_move(self, board: list[Optional[str]]) -> Optional[int]:
         """Get the computer's next move using simple strategy."""
