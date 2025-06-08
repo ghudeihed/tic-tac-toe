@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import List, Optional
 from config import Config, logger
 
 class TicTacToeGame:
@@ -8,7 +8,7 @@ class TicTacToeGame:
         self.computer_symbol = 'O'
         self.human_symbol = 'X'
     
-    def check_winner(self, board: list[Optional[str]], player: str) -> bool:
+    def check_winner(self, board: List[Optional[str]], player: str) -> bool:
         """Check if a player has won the game."""
         try:
             return any(all(board[i] == player for i in pattern) for pattern in self.win_patterns)
@@ -16,7 +16,7 @@ class TicTacToeGame:
             logger.error(f"Error checking winner: {str(e)}")
             return False
     
-    def is_draw(self, board: list[Optional[str]]) -> bool:
+    def is_draw(self, board: List[Optional[str]]) -> bool:
         """Check if the game is a draw."""
         try:
             return all(cell is not None for cell in board) and not self.check_winner(board, self.computer_symbol) and not self.check_winner(board, self.human_symbol)
@@ -24,7 +24,17 @@ class TicTacToeGame:
             logger.error(f"Error checking draw: {str(e)}")
             return False
     
-    def get_computer_move(self, board: list[Optional[str]]) -> Optional[int]:
+    def get_available_moves(self, board: List[Optional[str]]) -> List[int]:
+        """Get all available moves on the board."""
+        return [i for i in range(len(board)) if board[i] is None]
+    
+    def make_move(self, board: List[Optional[str]], position: int, player: str) -> List[Optional[str]]:
+        """Make a move on the board and return a new board state."""
+        new_board = board.copy()
+        new_board[position] = player
+        return new_board
+    
+    def get_computer_move(self, board: List[Optional[str]]) -> Optional[int]:
         """Get the computer's next move using simple strategy."""
         # Prioritize center
         if board[4] is None:
@@ -46,7 +56,7 @@ class TicTacToeGame:
         logger.warning("No available moves for computer")
         return None
     
-    def validate_move(self, board: list[Optional[str]], index: Optional[int]) -> tuple[bool, Optional[str]]:
+    def validate_move(self, board: List[Optional[str]], index: Optional[int]) -> tuple[bool, Optional[str]]:
         """Validate if a move is legal."""
         if not board:
             return False, "Board data required"
