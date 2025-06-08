@@ -1,20 +1,22 @@
-# game.py
+from typing import Optional
 from config import Config, logger
 
 class TicTacToeGame:
     def __init__(self):
         self.board_size = Config.BOARD_SIZE
         self.win_patterns = Config.WIN_PATTERNS
+        self.computer_symbol = 'O'
+        self.human_symbol = 'X'
     
-    def check_winner(self, board, player):
+    def check_winner(self, board: list[Optional[str]], player: str) -> bool:
         """Check if a player has won the game."""
         return any(all(board[i] == player for i in pattern) for pattern in self.win_patterns)
     
-    def is_draw(self, board):
+    def is_draw(self, board: list[Optional[str]]) -> bool:
         """Check if the game is a draw."""
         return all(cell is not None for cell in board)
     
-    def get_computer_move(self, board):
+    def get_computer_move(self, board: list[Optional[str]]) -> Optional[int]:
         """Get the computer's next move using simple strategy."""
         # Prioritize center
         if board[4] is None:
@@ -36,7 +38,7 @@ class TicTacToeGame:
         logger.warning("No available moves for computer")
         return None
     
-    def validate_move(self, board, index):
+    def validate_move(self, board: list[Optional[str]], index: Optional[int]) -> tuple[bool, Optional[str]]:
         """Validate if a move is legal."""
         if not board:
             return False, "Board data required"
