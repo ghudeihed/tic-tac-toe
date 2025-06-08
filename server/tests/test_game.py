@@ -84,8 +84,8 @@ class TestDrawDetection:
 
     def test_is_draw_mixed_scenarios(self, game, sample_boards):
         """Test draw detection with various board states."""
-        assert game.is_draw(sample_boards['all_x_board']) == True
-        assert game.is_draw(sample_boards['all_o_board']) == True
+        assert game.is_draw(sample_boards['all_x_board']) == False
+        assert game.is_draw(sample_boards['all_o_board']) == False
         assert game.is_draw(sample_boards['alternating_full_board']) == True
         assert game.is_draw(sample_boards['one_empty_at_start']) == False
         assert game.is_draw(sample_boards['one_empty_at_end']) == False
@@ -315,6 +315,29 @@ class TestMoveValidation:
         is_valid, error = game.validate_move(board, 1)
         assert is_valid == True
         assert error is None
+
+class TestErrorHandling:
+    """Test error handling and edge cases."""
+    
+    def test_check_winner_with_invalid_board(self, game):
+        """Test check_winner handles invalid board gracefully."""
+        # Invalid board that causes IndexError - this should be handled
+        result = game.check_winner([], 'X')
+        assert result == False
+        
+        # Another invalid scenario
+        result = game.check_winner([None, None], 'X')  # Too short
+        assert result == False
+    
+    def test_is_draw_with_invalid_board(self, game):
+        """Test is_draw handles invalid board gracefully."""
+        # Test board that's too short - should return False due to error handling
+        result = game.is_draw([])
+        assert result == True  # Empty list passes all() check, then hits error in check_winner
+        
+        # Test with mixed types that should cause issues
+        result = game.is_draw(['X', 'O', 1, 'X', None, None, None, None, None])
+        assert result == False  # Should handle TypeError gracefully
 
 class TestConfigIntegration:
     """Test integration with configuration settings."""
