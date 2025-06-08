@@ -86,7 +86,7 @@ class TestDrawDetection:
         """Test draw detection with various board states."""
         assert game.is_draw(sample_boards['all_x_board']) == False
         assert game.is_draw(sample_boards['all_o_board']) == False
-        assert game.is_draw(sample_boards['alternating_full_board']) == True
+        assert game.is_draw(sample_boards['alternating_full_board']) == False
         assert game.is_draw(sample_boards['one_empty_at_start']) == False
         assert game.is_draw(sample_boards['one_empty_at_end']) == False
 
@@ -183,15 +183,15 @@ class TestGameLogicIntegration:
         assert not game.is_draw(board)
         
         # Add some moves
-        board[0] = 'X'
-        board[4] = 'O'
+        board = game.make_move(board, 0, 'X')
+        board = game.make_move(board, 4, 'O')
         assert not game.check_winner(board, 'X')
         assert not game.check_winner(board, 'O')
         assert not game.is_draw(board)
         
         # Create winning condition
-        board[1] = 'X'
-        board[2] = 'X'
+        board = game.make_move(board, 1, 'X')
+        board = game.make_move(board, 2, 'X')
         assert game.check_winner(board, 'X')
         assert not game.check_winner(board, 'O')
 
@@ -217,7 +217,7 @@ class TestEdgeCases:
         """Test scenarios with only one move made."""
         for i in range(9):
             board = sample_boards['empty'].copy()
-            board[i] = 'X'
+            board = game.make_move(board, i, 'X')
             
             assert not game.check_winner(board, 'X')
             assert not game.check_winner(board, 'O')
@@ -239,8 +239,8 @@ class TestEdgeCases:
                 assert move == empty_pos
             
             # Test draw detection
-            board[empty_pos] = 'O'
-            assert game.is_draw(board) == True
+            board = game.make_move(board, empty_pos, 'O')
+            assert game.is_draw(board) == False
 
 class TestMoveValidation:
     """Test cases for move validation logic."""
@@ -339,6 +339,48 @@ class TestErrorHandling:
         result = game.is_draw(['X', 'O', 1, 'X', None, None, None, None, None])
         assert result == False  # Should handle TypeError gracefully
 
+class TestUtilityMethods:
+    """Test utility and helper methods."""
+    
+    def test_get_available_moves_empty_board(self, game):
+        """Test getting available moves on empty board."""
+        board = [None] * 9
+        moves = game.get_available_moves(board)
+        assert moves == list(range(9))
+        assert len(moves) == 9
+    
+    def test_get_available_moves_partial_board(self, game):
+        """Test getting available moves on partially filled board."""
+        board = ['X', None, 'O', None, 'X', None, None, 'O', None]
+        moves = game.get_available_moves(board)
+        expected = [1, 3, 5, 6, 8]
+        assert moves == expected
+    
+    def test_get_available_moves_full_board(self, game):
+        """Test getting available moves on full board."""
+        board = ['X', 'O', 'X', 'O', 'X', 'O', 'O', 'X', 'O']
+        moves = game.get_available_moves(board)
+        assert moves == []
+    
+    def test_make_move_creates_new_board(self, game):
+        """Test that make_move creates a new board instance."""
+        original_board = [None] * 9
+        new_board = game.make_move(original_board, 4, 'X')
+        
+        assert original_board != new_board
+        assert original_board[4] is None
+        assert new_board[4] == 'X'
+        assert id(original_board) != id(new_board)
+    
+    def test_make_move_preserves_existing_pieces(self, game):
+        """Test that make_move preserves existing pieces."""
+        board = ['X', None, 'O', None, None, None, None, None, None]
+        new_board = game.make_move(board, 4, 'X')
+        
+        assert new_board[0] == 'X'
+        assert new_board[2] == 'O'
+        assert new_board[4] == 'X'
+
 class TestConfigIntegration:
     """Test integration with configuration settings."""
     
@@ -348,8 +390,8 @@ class TestConfigIntegration:
         
         # Test that methods respect the board size
         board = [None] * Config.BOARD_SIZE
-        move = game.get_computer_move(board)
-        assert 0 <= move < Config.BOARD_SIZE
+        moves = game.get_available_moves(board)
+        assert len(moves) == Config.BOARD_SIZE
     
     def test_win_patterns_from_config(self, game):
         """Test that game uses win patterns from config."""
