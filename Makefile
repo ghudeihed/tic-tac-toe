@@ -1,26 +1,31 @@
-# Runs backend and frontend together
-up:
-	docker compose up --build -d 
+.PHONY: help up down restart test install-backend install-frontend clean logs build
 
-# Stops and removes containers
-down:
+help: ## Show this help message
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-22s\033[0m %s\n", $$1, $$2}'
+
+up: ## Run backend and frontend in Docker
+	docker compose up --build -d
+
+down: ## Stop and remove containers
 	docker compose down
 
-# Stops, removes, and rebuilds containers
-restart: down up
+restart: down up ## Restart containers (stop, rebuild, and start)
 
-# Runs backend tests
-test:
-	docker compose run --rm backend sh -c "PYTHONPATH=. pytest --cov=."
+test: ## Run backend tests with coverage report
+	PYTHONPATH=./server/ pytest --cov=. --cov-report=html
+	@command -v xdg-open && xdg-open ./htmlcov/index.html || open ./htmlcov/index.html || echo "Open ./htmlcov/index.html manually"
 
-# Installs Python backend dependencies
-install-backend:
+install-backend: ## Install Python backend dependencies
 	docker compose run --rm backend pip install -r requirements.txt
 
-# Installs Node frontend dependencies
-install-frontend:
+install-frontend: ## Install Node frontend dependencies
 	docker compose run --rm frontend npm install
 
-# Cleans up all dangling images and containers
-clean:
+clean: ## Remove all dangling images and containers
 	docker system prune -f
+
+logs: ## Tail logs from all containers
+	docker compose logs -f
+
+build: ## Rebuild all containers without running
+	docker compose build
