@@ -1,6 +1,6 @@
 import pytest
 from game import TicTacToeGame
-from config import Config
+from config.config import Config
 
 class TestWinDetection:
     """Test cases for win pattern detection."""

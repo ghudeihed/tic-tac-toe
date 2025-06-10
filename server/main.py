@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from config import Config, logger
+from config.config import Config, logger
 from game import TicTacToeGame
 
 app = Flask(__name__)

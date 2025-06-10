@@ -1,5 +1,5 @@
 from typing import List, Optional
-from config import Config, logger
+from config.config import Config, logger
 
 class TicTacToeGame:
     def __init__(self):
