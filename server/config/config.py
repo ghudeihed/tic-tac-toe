@@ -27,17 +27,25 @@ class Config:
     ALLOWED_ORIGINS = [origin.strip() for origin in 
                     os.getenv('ALLOWED_ORIGINS', 'http://localhost:5173').split(',')]
     
-    DEBUG_MODE = os.getenv('FLASK_ENV', 'production').lower() == 'development'
+    DEBUG_MODE = os.getenv('FLASK_ENV', 'development').lower() == 'development'
     PORT = int(os.getenv('PORT', 5000))
     
     @staticmethod
     def get_config():
         """Get configuration based on environment."""
-        env = os.getenv('FLASK_ENV', 'development')  # Default to development for safety
+        env = os.getenv('FLASK_ENV', 'development')
         
-        if env == 'production':
+        # Check if we're running tests
+        if os.getenv('TESTING') == 'true' or 'pytest' in os.environ.get('_', ''):
+            from .testing import TestingConfig
+            return TestingConfig()
+        elif env == 'production':
             from .production import ProductionConfig
             return ProductionConfig()
+        elif env == 'development':
+            from .development import DevelopmentConfig
+            return DevelopmentConfig()
         else:
-            # Return development config (current Config class)
-            return Config()
+            # Default to development
+            from .development import DevelopmentConfig
+            return DevelopmentConfig()

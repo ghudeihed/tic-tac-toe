@@ -43,14 +43,14 @@ class TestConfig:
     def test_port_default_when_not_set(self):
         """Test default port when PORT environment variable is not set."""
         # Reload config module to test default behavior
-        import server.config.config as config
+        import config.config as config
         importlib.reload(config)
         assert config.Config.PORT == 5000
     
     @patch.dict(os.environ, {'PORT': '8080'})
     def test_port_from_environment(self):
         """Test port is read from PORT environment variable."""
-        import server.config.config as config
+        import config.config as config
         importlib.reload(config)
         assert config.Config.PORT == 8080
     
@@ -62,28 +62,28 @@ class TestConfig:
     @patch.dict(os.environ, {'ALLOWED_ORIGINS': 'http://localhost:3000,http://localhost:8080'})
     def test_allowed_origins_from_environment(self):
         """Test allowed origins are read from environment variable."""
-        import server.config.config as config
+        import config.config as config
         importlib.reload(config)
         expected_origins = ['http://localhost:3000', 'http://localhost:8080']
         assert config.Config.ALLOWED_ORIGINS == expected_origins
     
     @patch.dict(os.environ, {'FLASK_ENV': 'development'})
-    def test_debug_mode_development(self):
+    def test_DEBUG_development(self):
         """Test debug mode is enabled in development environment."""
-        import server.config.config as config
+        import config.config as config
         importlib.reload(config)
         assert config.Config.DEBUG_MODE is True
     
     @patch.dict(os.environ, {'FLASK_ENV': 'production'})
-    def test_debug_mode_production(self):
+    def test_DEBUG_production(self):
         """Test debug mode is disabled in production environment."""
-        import server.config.config as config
+        import config.config as config
         importlib.reload(config)
         assert config.Config.DEBUG_MODE is False
     
     @patch.dict(os.environ, {}, clear=True)
-    def test_debug_mode_default(self):
+    def test_DEBUG_default(self):
         """Test debug mode defaults to False when FLASK_ENV is not set."""
-        import server.config.config as config
+        import config.config as config
         importlib.reload(config)
         assert config.Config.DEBUG_MODE is False
