@@ -26,8 +26,19 @@ prod-frontend: ## Deploy only frontend in production
 
 # Testing
 test: ## Run backend tests with coverage report
-	docker compose run --rm backend sh -c "cd /app && PYTHONPATH=. pytest --cov=. --cov-report=html --cov-report=term"
-	@echo "Coverage report would be generated in htmlcov/ (if running locally)"
+	@echo "Running backend tests with coverage..."
+	docker compose run --rm -e COVERAGE_FILE=/tmp/.coverage backend sh -c "\
+		cd /app && \
+		rm -f /tmp/.coverage* && \
+		PYTHONPATH=. pytest --cov=. --cov-report=term-missing --cov-report=html:/tmp/htmlcov && \
+		echo 'Tests completed. Coverage report would be in htmlcov/ if running locally'"
+
+test-no-coverage: ## Run backend tests without coverage
+	docker compose run --rm backend sh -c "cd /app && PYTHONPATH=. pytest -v"
+
+test-local: ## Run tests locally (not in Docker)
+	@echo "Running tests locally..."
+	cd server && PYTHONPATH=. pytest --cov=. --cov-report=html --cov-report=term-missing
 
 test-frontend: ## Run frontend linting
 	docker compose run --rm frontend npm run lint
@@ -104,6 +115,9 @@ clean: ## Remove all containers and images
 	docker compose -f docker-compose.backend.yml down -v --remove-orphans
 	docker compose -f docker-compose.frontend.yml down -v --remove-orphans
 	docker system prune -f
+
+clean-coverage: ## Clean coverage files
+	rm -rf server/htmlcov server/.coverage* .coverage*
 
 stop: ## Stop all containers
 	docker compose down
