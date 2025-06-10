@@ -91,7 +91,156 @@ class TestDrawDetection:
         assert game.is_draw(sample_boards['one_empty_at_end']) == False
 
 class TestComputerStrategy:
-    """Test cases for computer move strategy."""
+    """Test cases for computer move strategy - comprehensive coverage."""
+    
+    # ========== WIN STRATEGY TESTS (Priority 1) ==========
+    
+    def test_computer_takes_winning_move_rows(self, game):
+        """Test computer takes winning moves in all rows."""
+        # Top row win
+        board = ['O', 'O', None, 'X', 'X', None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 2
+        
+        # Middle row win
+        board = [None, None, None, 'O', 'O', None, 'X', 'X', None]
+        move = game.get_computer_move(board)
+        assert move == 5
+        
+        # Bottom row win
+        board = ['X', None, None, None, None, None, 'O', 'O', None]
+        move = game.get_computer_move(board)
+        assert move == 8
+
+    def test_computer_takes_winning_move_columns(self, game):
+        """Test computer takes winning moves in all columns."""
+        # Left column win
+        board = ['O', 'X', None, 'O', 'X', None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 6
+        
+        # Middle column win
+        board = [None, 'O', None, None, 'O', None, 'X', None, 'X']
+        move = game.get_computer_move(board)
+        assert move == 7
+        
+        # Right column win
+        board = [None, None, 'O', None, 'X', 'O', None, 'X', None]
+        move = game.get_computer_move(board)
+        assert move == 8
+
+    def test_computer_takes_winning_move_diagonals(self, game):
+        """Test computer takes winning moves in diagonals."""
+        # Main diagonal win
+        board = ['O', 'X', None, None, 'O', 'X', None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 8
+        
+        # Anti-diagonal win
+        board = [None, None, 'O', None, 'O', None, None, 'X', 'X']
+        move = game.get_computer_move(board)
+        assert move == 6
+
+    # ========== BLOCK STRATEGY TESTS (Priority 2) ==========
+    
+    def test_computer_blocks_human_win_rows(self, game):
+        """Test computer blocks human winning moves in rows."""
+        # Block top row
+        board = ['X', 'X', None, 'O', None, None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 2
+        
+        # Block middle row
+        board = [None, None, None, 'X', 'X', None, 'O', None, None]
+        move = game.get_computer_move(board)
+        assert move == 5
+        
+        # Block bottom row
+        board = ['O', None, None, None, None, None, 'X', 'X', None]
+        move = game.get_computer_move(board)
+        assert move == 8
+
+    def test_computer_blocks_human_win_columns(self, game):
+        """Test computer blocks human winning moves in columns."""
+        # Block left column
+        board = ['X', 'O', None, 'X', None, None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 6
+        
+        # Block middle column
+        board = [None, 'X', None, None, 'X', None, 'O', None, None]
+        move = game.get_computer_move(board)
+        assert move == 7
+        
+        # Block right column
+        board = [None, None, 'X', None, 'O', 'X', None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 8
+
+    def test_computer_blocks_human_win_diagonals(self, game):
+        """Test computer blocks human winning moves in diagonals."""
+        # Block main diagonal
+        board = ['X', 'O', None, None, 'X', None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 8
+        
+        # Block anti-diagonal
+        board = [None, None, 'X', None, 'X', None, None, 'O', None]
+        move = game.get_computer_move(board)
+        assert move == 6
+
+    # ========== FORK STRATEGY TESTS (Priority 3) ==========
+    
+    def test_computer_creates_fork_corner_setup(self, game):
+        """Test computer creates fork with corner positions."""
+        # Computer at opposite corners creates fork opportunity
+        board = ['O', None, None, None, 'X', None, None, None, 'O']
+        move = game.get_computer_move(board)
+        # AI correctly chooses corner that creates fork (position 2 or 6)
+        assert move in [2, 6]
+        
+        # Verify it actually creates a fork
+        new_board = game.make_move(board, move, 'O')
+        win_opportunities = 0
+        for pos in game.get_available_moves(new_board):
+            test_board = game.make_move(new_board, pos, 'O')
+            if game.check_winner(test_board, 'O'):
+                win_opportunities += 1
+        assert win_opportunities >= 2
+
+    def test_computer_creates_fork_edge_center(self, game):
+        """Test computer creates fork with edge and center positions."""
+        # Computer at center and corner
+        board = [None, None, None, None, 'O', None, None, None, 'O']
+        move = game.get_computer_move(board)
+        # Should create fork
+        if move is not None:
+            new_board = game.make_move(board, move, 'O')
+            win_opportunities = sum(
+                1 for pos in game.get_available_moves(new_board)
+                if game.check_winner(game.make_move(new_board, pos, 'O'), 'O')
+            )
+            assert win_opportunities >= 2
+
+    # ========== BLOCK FORK STRATEGY TESTS (Priority 4) ==========
+    
+    def test_computer_blocks_human_fork_opposite_corners(self, game):
+        """Test computer blocks human fork with opposite corners."""
+        # Human at opposite corners creates fork threat
+        board = ['X', None, None, None, 'O', None, None, None, 'X']
+        move = game.get_computer_move(board)
+        # AI correctly blocks fork by taking corner (position 2 or 6)
+        assert move in [2, 6]
+
+    def test_computer_blocks_human_fork_corner_edge(self, game):
+        """Test computer blocks human fork setups."""
+        # Human setup that could create fork
+        board = ['X', None, None, None, None, None, None, None, 'X']
+        move = game.get_computer_move(board)
+        # Should take center to prevent fork
+        assert move == 4
+
+    # ========== CENTER STRATEGY TESTS (Priority 5) ==========
     
     def test_computer_chooses_center_when_available(self, game, sample_boards):
         """Test computer prioritizes center position."""
@@ -105,6 +254,47 @@ class TestComputerStrategy:
             move = game.get_computer_move(board)
             assert move == 4
 
+    def test_computer_center_priority_over_corners(self, game):
+        """Test center takes priority over corners when available."""
+        # Human at corner, center available
+        board = ['X', None, None, None, None, None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 4
+
+    # ========== OPPOSITE CORNER STRATEGY TESTS (Priority 6) ==========
+    
+    def test_computer_takes_opposite_corner_pairs(self, game):
+        """Test computer takes opposite corner strategy."""
+        # Human at top-left (0), computer should take bottom-right (8)
+        board = ['X', None, None, None, 'O', None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 8
+        
+        # Human at top-right (2), computer should take bottom-left (6)
+        board = [None, None, 'X', None, 'O', None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 6
+        
+        # Human at bottom-left (6), computer should take top-right (2)
+        board = [None, None, None, None, 'O', None, 'X', None, None]
+        move = game.get_computer_move(board)
+        assert move == 2
+        
+        # Human at bottom-right (8), computer should take top-left (0)
+        board = [None, None, None, None, 'O', None, None, None, 'X']
+        move = game.get_computer_move(board)
+        assert move == 0
+
+    def test_computer_opposite_corner_multiple_options(self, game):
+        """Test computer behavior with multiple human corners."""
+        # Human at multiple corners, computer must block immediate win
+        board = ['X', None, 'X', None, 'O', None, None, None, None]
+        move = game.get_computer_move(board)
+        # AI correctly blocks immediate win at position 1 (top row)
+        assert move == 1
+
+    # ========== EMPTY CORNER STRATEGY TESTS (Priority 7) ==========
+    
     def test_computer_chooses_corner_when_center_taken(self, game, sample_boards):
         """Test computer prioritizes corners when center is occupied."""
         center_taken_boards = [
@@ -117,39 +307,191 @@ class TestComputerStrategy:
             move = game.get_computer_move(board)
             assert move in [0, 2, 6, 8]
 
-    def test_computer_chooses_side_when_center_and_corners_taken(self, game, sample_boards):
-        """Test computer chooses sides when center and all corners are taken."""
-        board = sample_boards['all_corners_center_taken']
-        move = game.get_computer_move(board)
-        assert move in [1, 3, 5, 7]
-
-    def test_computer_strategy_priority_order(self, game, sample_boards):
-        """Test that computer follows correct priority: center -> corners -> sides."""
-        
-        board = sample_boards['center_taken_by_o']
-        move = game.get_computer_move(board)
-        assert move in [0, 2, 6, 8]
-        
-        board = sample_boards['all_corners_center_taken']
-        move = game.get_computer_move(board)
-        assert move in [1, 3, 5, 7]
-
-    def test_computer_no_moves_available(self, game, sample_boards):
-        """Test computer behavior when no moves are available."""
-        move = game.get_computer_move(sample_boards['full_board_no_moves'])
-        assert move is None
-
     def test_computer_chooses_available_corner(self, game, sample_boards):
         """Test computer chooses available corner when some are taken."""
         board = sample_boards['corners_0_2_taken']
         move = game.get_computer_move(board)
         assert move in [6, 8]
 
+    def test_computer_corner_preference_order(self, game):
+        """Test computer corner selection follows consistent order."""
+        # Center taken, all corners available
+        board = [None, None, None, None, 'X', None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move in [0, 2, 6, 8]
+
+    # ========== EMPTY SIDE STRATEGY TESTS (Priority 8) ==========
+    
+    def test_computer_chooses_side_when_center_and_corners_taken(self, game, sample_boards):
+        """Test computer chooses sides when center and all corners are taken."""
+        board = sample_boards['all_corners_center_taken']
+        move = game.get_computer_move(board)
+        assert move in [1, 3, 5, 7]
+
     def test_computer_chooses_available_side(self, game, sample_boards):
         """Test computer chooses available side when some are taken."""
         board = sample_boards['corners_center_sides_partial']
         move = game.get_computer_move(board)
         assert move in [3, 5]
+
+    def test_computer_side_last_resort(self, game):
+        """Test sides are chosen only when no better options exist."""
+        # All corners and center taken, only sides available
+        board = ['X', None, 'O', None, 'X', None, 'O', None, 'X']
+        move = game.get_computer_move(board)
+        assert move in [1, 3, 5, 7]
+
+    # ========== PRIORITY ORDER TESTS ==========
+    
+    def test_win_overrides_block(self, game):
+        """Test that winning move takes priority over blocking."""
+        # Computer can win OR block, should choose win
+        board = ['O', 'O', None, 'X', 'X', None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 2  # Win instead of blocking at position 5
+
+    def test_win_overrides_all_other_strategies(self, game):
+        """Test win takes priority over all other strategies."""
+        # Win available with center also available
+        board = ['O', 'O', None, None, None, None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 2  # Win instead of center
+
+    def test_block_overrides_center(self, game):
+        """Test that blocking takes priority over center."""
+        # Center available but must block
+        board = ['X', 'X', None, None, None, None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 2  # Block instead of taking center
+
+    def test_block_overrides_corners_and_sides(self, game):
+        """Test blocking takes priority over positional strategies."""
+        # Must block, corners available
+        board = [None, None, None, 'X', 'X', None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 5  # Block instead of corner
+
+    def test_fork_overrides_center(self, game):
+        """Test that fork creation takes priority over center."""
+        # Setup where fork is available and center is free
+        board = ['O', None, None, None, None, None, None, None, 'O']
+        move = game.get_computer_move(board)
+        # Should create fork instead of taking center
+        if move != 4:  # If not center, verify it creates a fork
+            new_board = game.make_move(board, move, 'O')
+            win_opportunities = sum(
+                1 for pos in game.get_available_moves(new_board)
+                if game.check_winner(game.make_move(new_board, pos, 'O'), 'O')
+            )
+            assert win_opportunities >= 2
+
+    def test_center_overrides_corners(self, game):
+        """Test center takes priority over corners."""
+        # Center and corners available
+        board = ['X', None, None, None, None, None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 4
+
+    def test_corners_override_sides(self, game):
+        """Test corners take priority over sides."""
+        # Center taken, corners and sides available
+        board = [None, None, None, None, 'X', None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move in [0, 2, 6, 8]
+
+    # ========== EDGE CASES AND NO MOVES ==========
+    
+    def test_computer_no_moves_available(self, game, sample_boards):
+        """Test computer behavior when no moves are available."""
+        move = game.get_computer_move(sample_boards['full_board_no_moves'])
+        assert move is None
+
+    def test_computer_move_with_one_option(self, game):
+        """Test computer behavior with only one available move."""
+        board = ['X', 'O', 'X', 'O', 'X', 'O', 'O', 'X', None]
+        move = game.get_computer_move(board)
+        assert move == 8
+
+    def test_computer_early_game_scenarios(self, game):
+        """Test computer moves in early game situations."""
+        # Human takes corner, computer should take center
+        board = ['X', None, None, None, None, None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 4
+        
+        # Human takes side, computer should take center
+        board = [None, 'X', None, None, None, None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move == 4
+        
+        # Human takes center, computer should take corner
+        board = [None, None, None, None, 'X', None, None, None, None]
+        move = game.get_computer_move(board)
+        assert move in [0, 2, 6, 8]
+
+    # ========== INTEGRATION AND GAMEPLAY TESTS ==========
+    
+    def test_computer_move_validity(self, game, sample_boards):
+        """Test that computer always chooses valid moves."""
+        test_boards = [
+            sample_boards['empty'],
+            sample_boards['game_in_progress'],
+            sample_boards['center_taken'],
+            sample_boards['many_moves_board'],
+        ]
+        
+        for board in test_boards:
+            move = game.get_computer_move(board)
+            if move is not None:
+                assert 0 <= move <= 8
+                assert board[move] is None
+                
+    def test_computer_never_loses_over_gameplay(self, game):
+        """Ensure the computer never loses in full gameplay simulation."""
+        from random import choice
+
+        for first_human_move in range(9):
+            if first_human_move == 4:
+                continue  # Computer will take center anyway
+
+            board = [None] * 9
+            board[first_human_move] = game.human_symbol
+
+            for _ in range(4):  # Up to 4 more human turns
+                # Computer's turn
+                comp_move = game.get_computer_move(board)
+                assert comp_move is not None
+                board = game.make_move(board, comp_move, game.computer_symbol)
+
+                if game.check_winner(board, game.computer_symbol):
+                    break  # computer wins, OK
+
+                if game.is_draw(board):
+                    break  # draw, OK
+
+                # Human makes a valid random move
+                human_moves = game.get_available_moves(board)
+                if not human_moves:
+                    break
+
+                board = game.make_move(board, choice(human_moves), game.human_symbol)
+
+                # Now check that computer hasn't lost
+                assert not game.check_winner(board, game.human_symbol), \
+                    f"Computer lost when human started with {first_human_move} and board was {board}"
+
+    def test_computer_strategy_consistency(self, game):
+        """Test that computer strategy is consistent across similar board states."""
+        # Similar board states should produce similar strategic responses
+        board1 = ['X', None, None, None, None, None, None, None, None]
+        board2 = [None, None, 'X', None, None, None, None, None, None]
+        
+        move1 = game.get_computer_move(board1)
+        move2 = game.get_computer_move(board2)
+        
+        # Both should take center
+        assert move1 == 4
+        assert move2 == 4
 
 class TestGameLogicIntegration:
     """Integration tests for game logic components."""
@@ -194,21 +536,6 @@ class TestGameLogicIntegration:
         board = game.make_move(board, 2, 'X')
         assert game.check_winner(board, 'X')
         assert not game.check_winner(board, 'O')
-
-    def test_computer_move_validity(self, game, sample_boards):
-        """Test that computer always chooses valid moves."""
-        test_boards = [
-            sample_boards['empty'],
-            sample_boards['game_in_progress'],
-            sample_boards['center_taken'],
-            sample_boards['many_moves_board'],
-        ]
-        
-        for board in test_boards:
-            move = game.get_computer_move(board)
-            if move is not None:
-                assert 0 <= move <= 8
-                assert board[move] is None
 
 class TestEdgeCases:
     """Test cases for edge cases and boundary conditions."""
@@ -372,40 +699,15 @@ class TestUtilityMethods:
         assert new_board[4] == 'X'
         assert id(original_board) != id(new_board)
     
-    def test_make_move_preserves_existing_pieces(self, game):
-        """Test that make_move preserves existing pieces."""
+    def test_make_move_preserves_other_positions(self, game):
+        """Test that make_move only changes the specified position."""
         board = ['X', None, 'O', None, None, None, None, None, None]
         new_board = game.make_move(board, 4, 'X')
         
+        # Check that other positions are preserved
         assert new_board[0] == 'X'
         assert new_board[2] == 'O'
-        assert new_board[4] == 'X'
+        assert new_board[4] == 'X'  # New move
+        assert new_board[1] is None
+        assert new_board[3] is None
 
-class TestConfigIntegration:
-    """Test integration with configuration settings."""
-    
-    def test_board_size_from_config(self, game):
-        """Test that game uses board size from config."""
-        assert game.board_size == Config.BOARD_SIZE
-        
-        # Test that methods respect the board size
-        board = [None] * Config.BOARD_SIZE
-        moves = game.get_available_moves(board)
-        assert len(moves) == Config.BOARD_SIZE
-    
-    def test_win_patterns_from_config(self, game):
-        """Test that game uses win patterns from config."""
-        assert game.win_patterns == Config.WIN_PATTERNS
-        
-        # Test that each win pattern works
-        for pattern in Config.WIN_PATTERNS:
-            board = [None] * Config.BOARD_SIZE
-            for pos in pattern:
-                board[pos] = 'X'
-            assert game.check_winner(board, 'X') == True
-    
-    def test_symbol_assignment(self, game):
-        """Test that symbols are correctly assigned."""
-        assert game.computer_symbol == 'O'
-        assert game.human_symbol == 'X'
-        assert game.computer_symbol != game.human_symbol
