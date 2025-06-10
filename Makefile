@@ -29,3 +29,6 @@ logs: ## Tail logs from all containers
 
 build: ## Rebuild all containers without running
 	docker compose build
+
+tree: ## Show directory structure
+	tree -I 'node_modules|__pycache__|.git|.venv|.idea|.vscode|dist|build|htmlcov|logs' --dirsfirst
