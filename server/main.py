@@ -1,6 +1,8 @@
+import os
+from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from server.config.config import Config, logger
+from config.config import Config, logger
 from game import TicTacToeGame
 
 app = Flask(__name__)
@@ -9,11 +11,32 @@ CORS(app, origins=Config.ALLOWED_ORIGINS)
 
 game = TicTacToeGame()
 
-@app.route("/ping", methods=["GET"])
-def ping():
-    """Health check endpoint."""
-    logger.info("Ping endpoint accessed")
-    return jsonify({"message": "pong"})
+@app.route("/health", methods=["GET"])
+def health():
+    """Comprehensive health check."""
+    health_status = {
+        "status": "healthy",
+        "timestamp": datetime.utcnow().isoformat(),
+        "version": os.getenv("APP_VERSION", "1.0.0"),
+        "environment": os.getenv("FLASK_ENV", "production"),
+        "checks": {
+            "api": "ok",
+            "game_logic": "ok"
+        }
+    }
+    
+    try:
+        # Test game logic
+        test_game = TicTacToeGame()
+        test_board = [None] * 9
+        test_game.validate_move(test_board, 0)
+            
+    except Exception as e:
+        health_status["status"] = "unhealthy"
+        health_status["checks"]["game_logic"] = f"error: {str(e)}"
+        return jsonify(health_status), 503
+    
+    return jsonify(health_status)
 
 @app.route('/move', methods=['POST'])
 def move():

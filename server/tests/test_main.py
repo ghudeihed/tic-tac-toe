@@ -1,17 +1,5 @@
 import pytest
 
-
-class TestPingEndpoint:
-    """Test cases for the ping endpoint."""
-    
-    def test_ping_success(self, client):
-        """Test ping endpoint returns correct response."""
-        response = client.get("/ping")
-        assert response.status_code == 200
-        assert response.get_json() == {"message": "pong"}
-        assert response.content_type == 'application/json'
-
-
 class TestMoveEndpointHTTP:
     """Test cases for HTTP/API behavior of move endpoint."""
     
@@ -137,9 +125,9 @@ class TestErrorHandling:
         assert response.status_code == 404
         assert "Endpoint not found" in response.get_json()["error"]
 
-    def test_method_not_allowed_ping(self, client):
-        """Test method not allowed for ping endpoint."""
-        response = client.put("/ping")
+    def test_method_not_allowed_health(self, client):
+        """Test method not allowed for health endpoint."""
+        response = client.put("/health")
         assert response.status_code == 405
 
     def test_method_not_allowed_move(self, client):
@@ -167,13 +155,18 @@ class TestResponseFormat:
         assert isinstance(data["error"], str)
         assert response.content_type == 'application/json'
 
-    def test_ping_response_format(self, client):
-        """Test ping response format."""
-        response = client.get("/ping")
-        data = response.get_json()
+    def test_health_response_format(self, client):
+        """Test health response format."""
+        response = client.get("/health")
+        health_status = response.get_json()
         
         assert response.status_code == 200
-        assert data == {"message": "pong"}
+        assert health_status["status"] in ["healthy", "unhealthy"]
+        assert health_status["version"] == "1.0.0"
+        assert health_status["environment"] in ["production", "development"]
+        assert "checks" in health_status
+        assert health_status["checks"]["api"] == "ok"
+        assert health_status["checks"]["game_logic"] == "ok"
         assert response.content_type == 'application/json'
 
 
