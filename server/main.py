@@ -102,8 +102,6 @@ def create_app(config_name=None):
         logger.info("Ping endpoint accessed")
         return jsonify({"message": "pong"})
 
-    @app.route('/move', methods=['POST'])
-    @limiter.limit("30 per minute")
     def move():
         """Handle player move and computer response with validation."""
         try:
@@ -156,6 +154,13 @@ def create_app(config_name=None):
             if 'sentry_sdk' in globals():
                 sentry_sdk.capture_exception(e)
             return jsonify({"error": "Internal server error"}), 500
+
+    # Apply rate limiting conditionally
+    if limiter:
+        move = limiter.limit("30 per minute")(move)
+    
+    # Register the route
+    app.add_url_rule('/move', 'move', move, methods=['POST'])
 
     @app.errorhandler(404)
     def not_found(error):
