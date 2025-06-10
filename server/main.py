@@ -103,19 +103,9 @@ def create_app(config_name=None):
         return jsonify({"message": "pong"})
 
     @app.route('/move', methods=['POST'])
+    @limiter.limit("30 per minute")
     def move():
         """Handle player move and computer response with validation."""
-        # Apply rate limiting only if limiter exists
-        if limiter:
-            try:
-                # Check rate limit manually since decorator might not work in factory
-                pass  # limiter will automatically apply limits
-            except Exception:
-                return jsonify({
-                    "error": "Rate limit exceeded", 
-                    "retry_after": "60"
-                }), 429
-        
         try:
             # Validate input
             data, errors = validate_move_input(request.get_json() or {})
@@ -163,11 +153,8 @@ def create_app(config_name=None):
         
         except Exception as e:
             logger.error(f"Error processing move: {str(e)}")
-            try:
-                import sentry_sdk
+            if 'sentry_sdk' in globals():
                 sentry_sdk.capture_exception(e)
-            except ImportError:
-                pass
             return jsonify({"error": "Internal server error"}), 500
 
     @app.errorhandler(404)
