@@ -9,3 +9,4 @@ redis
 pytest
 pytest-cov
 sentry-sdk[flask]
+python-dotenv
