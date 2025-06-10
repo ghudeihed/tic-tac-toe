@@ -1,0 +1,18 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: client/Dockerfile.prod
+      target: production
+      args:
+        ENV_FILE: .env.production
+    container_name: tic-tac-toe-frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    networks:
+      - frontend-network
+
+networks:
+  frontend-network:
+    driver: bridge
