@@ -2,7 +2,7 @@ import os
 import logging
 
 # Create logs directory if it doesn't exist
-log_dir = os.path.join(os.path.dirname(__file__), 'logs')
+log_dir = os.path.join(os.path.dirname(__file__), '..', 'logs')
 os.makedirs(log_dir, exist_ok=True)
 
 logging.basicConfig(
@@ -29,3 +29,15 @@ class Config:
     
     DEBUG_MODE = os.getenv('FLASK_ENV', 'production').lower() == 'development'
     PORT = int(os.getenv('PORT', 5000))
+    
+    @staticmethod
+    def get_config():
+        """Get configuration based on environment."""
+        env = os.getenv('FLASK_ENV', 'development')  # Default to development for safety
+        
+        if env == 'production':
+            from .production import ProductionConfig
+            return ProductionConfig()
+        else:
+            # Return development config (current Config class)
+            return Config()
