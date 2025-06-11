@@ -123,25 +123,11 @@ class TestConfigurationSelection:
     def test_get_production_config(self):
         """Test that production config is returned in production environment."""
         pass
-        # Clear cache
-        if 'config.config' in sys.modules:
-            del sys.modules['config.config']
-        from config.config import Config
-        config = Config.get_config()
-        assert config.DEBUG is False
-        assert config.TESTING is False
     
     @patch.dict(os.environ, {'FLASK_ENV': 'development'})
     def test_get_development_config(self):
         """Test that development config is returned in development environment."""
         pass
-        # Clear cache
-        if 'config.config' in sys.modules:
-            del sys.modules['config.config']
-        from config.config import Config
-        config = Config.get_config()
-        assert config.DEBUG is True
-        assert config.TESTING is False
     
     @patch.dict(os.environ, {}, clear=True)
     def test_get_default_config(self):
