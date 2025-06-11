@@ -96,17 +96,22 @@ def create_app(config_name=None):
         
         return jsonify(health_status)
 
-    @app.route("/ping", methods=["GET"])
-    def ping():
-        """Simple health check endpoint."""
-        logger.info("Ping endpoint accessed")
-        return jsonify({"message": "pong"})
-
     def move():
         """Handle player move and computer response with validation."""
         try:
-            # Validate input
-            data, errors = validate_move_input(request.get_json() or {})
+            # Handle request parsing errors
+            try:
+                json_data = request.get_json()
+            except Exception as e:
+                logger.warning(f"Invalid JSON data: {str(e)}")
+                return jsonify({"error": "Invalid JSON data"}), 400
+            
+            if json_data is None:
+                logger.warning("No JSON data received")
+                return jsonify({"error": "No JSON data provided"}), 400
+            
+            # Validate input with marshmallow
+            data, errors = validate_move_input(json_data)
             if errors:
                 logger.warning(f"Input validation failed: {errors}")
                 return jsonify({"error": "Invalid input", "details": errors}), 400
