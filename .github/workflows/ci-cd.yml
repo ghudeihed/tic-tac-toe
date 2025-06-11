@@ -195,4 +195,3 @@ jobs:
         echo "🧪 Deploying to staging environment..."
         echo "This would deploy to a staging ECS service"
         # Add your staging deployment commands here
-        # Example: deploy to tic-tac-toe-staging-cluster
