@@ -142,3 +142,6 @@ install-backend: ## Install Python backend dependencies
 
 install-frontend: ## Install Node frontend dependencies
 	docker compose run --rm frontend npm install
+
+tree: ## Show directory structure
+	@tree -I 'node_modules|__pycache__|.git|.venv|.env|.coverage*|htmlcov|logs|dist|build|coverage|.DS_Store' -L 3
