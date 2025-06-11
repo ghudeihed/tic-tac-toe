@@ -16,8 +16,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ./server .
 
-# Set permissions for coverage files
-RUN mkdir -p /tmp/htmlcov && chmod 755 /tmp/htmlcov
+# Create directories with proper permissions
+RUN mkdir -p /tmp/coverage /tmp/pytest_cache && \
+    chmod 777 /tmp/coverage /tmp/pytest_cache
 
 EXPOSE 5000
 
