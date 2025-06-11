@@ -37,6 +37,13 @@ def game():
     from game import TicTacToeGame
     return TicTacToeGame()
 
+@pytest.fixture(autouse=True)
+def setup_test_environment():
+    """Ensure tests run in testing environment."""
+    os.environ['FLASK_ENV'] = 'testing'
+    os.environ['TESTING'] = 'true'
+    yield
+
 @pytest.fixture
 def empty_board():
     """Provide an empty 3x3 game board."""

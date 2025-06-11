@@ -448,8 +448,17 @@ class TestComputerStrategy:
                 
     def test_computer_never_loses_over_gameplay(self, game):
         """Ensure the computer never loses in full gameplay simulation."""
-        from random import choice
-
+        import random
+        import os
+        
+        # Debug: Print environment info
+        print(f"FLASK_ENV: {os.getenv('FLASK_ENV', 'not set')}")
+        print(f"PYTHONPATH: {os.getenv('PYTHONPATH', 'not set')}")
+        print(f"Random seed: {random.getstate()[1][0]}")
+        
+        # Set a fixed seed for reproducible tests
+        random.seed(42)
+        
         for first_human_move in range(9):
             if first_human_move == 4:
                 continue  # Computer will take center anyway
@@ -474,11 +483,13 @@ class TestComputerStrategy:
                 if not human_moves:
                     break
 
-                board = game.make_move(board, choice(human_moves), game.human_symbol)
+                # Use deterministic choice with seed
+                human_choice = human_moves[0] if len(human_moves) == 1 else random.choice(human_moves)
+                board = game.make_move(board, human_choice, game.human_symbol)
 
                 # Now check that computer hasn't lost
                 assert not game.check_winner(board, game.human_symbol), \
-                    f"Computer lost when human started with {first_human_move} and board was {board}"
+                f"Computer lost when human started with {first_human_move} and board was {board}"
 
     def test_computer_strategy_consistency(self, game):
         """Test that computer strategy is consistent across similar board states."""

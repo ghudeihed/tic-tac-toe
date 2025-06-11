@@ -183,7 +183,7 @@ class TestResponseFormat:
         assert response.status_code == 200
         assert health_status["status"] in ["healthy", "unhealthy"]
         assert health_status["version"] == "1.0.0"
-        assert health_status["environment"] in ["production", "development"]
+        assert health_status["environment"] in ["production", "development", "testing"]
         assert "checks" in health_status
         assert health_status["checks"]["api"] == "ok"
         assert health_status["checks"]["game_logic"] == "ok"
