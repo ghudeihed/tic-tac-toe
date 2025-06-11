@@ -7,17 +7,20 @@ function App() {
   const [board, setBoard] = useState(initialBoard);
   const [status, setStatus] = useState('Your move');
   const [isGameOver, setIsGameOver] = useState(false);
-  const [isLoading, setIsLoading] = useState(false); // Added missing state
-  const [error, setError] = useState(null); // Added error state
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleClick = async (index) => {
-    if (board[index] || isGameOver || isLoading) return; // Added isLoading check
+    if (board[index] || isGameOver || isLoading) return;
 
     setIsLoading(true);
-    setError(null); // Clear previous errors
+    setError(null);
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/move`, {
+      // Get API URL from environment, fallback to /api
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
+      
+      const response = await fetch(`${apiUrl}/move`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ board, index }),
@@ -41,6 +44,7 @@ function App() {
     } catch (error) {
       setError('Failed to make move. Please try again.');
       console.error('Move error:', error);
+      console.log('API URL used:', import.meta.env.VITE_API_URL || '/api');
     } finally {
       setIsLoading(false);
     }
@@ -66,6 +70,13 @@ function App() {
     <div className="container">
       <h1>Tic-Tac-Toe</h1>
       
+      {/* Debug info (remove in production) */}
+      {import.meta.env.DEV && (
+        <p style={{fontSize: '0.8em', color: '#666'}}>
+          API URL: {import.meta.env.VITE_API_URL || '/api'}
+        </p>
+      )}
+      
       {/* Error message display */}
       {error && (
         <div className="error-message" role="alert">
@@ -86,7 +97,7 @@ function App() {
             key={i}
             className={`cell ${cell === 'X' ? 'x' : cell === 'O' ? 'o' : ''} ${isLoading ? 'loading' : ''}`}
             onClick={() => handleClick(i)}
-            disabled={!!cell || isGameOver || isLoading} // Added isLoading to disabled condition
+            disabled={!!cell || isGameOver || isLoading}
           >
             {cell}
           </button>
