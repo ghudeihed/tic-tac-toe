@@ -1,0 +1,56 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: server/Dockerfile.prod
+    container_name: tic-tac-toe-backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./server/.env.production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - app-network
+    depends_on:
+      - redis
+
+  frontend:
+    build:
+      context: .
+      dockerfile: client/Dockerfile.prod
+      target: production
+      args:
+        ENV_FILE: .env.production
+    container_name: tic-tac-toe-frontend
+    ports:
+      - "80:80"
+    env_file:
+      - ./client/.env.production
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: tic-tac-toe-redis
+    restart: unless-stopped
+    networks:
+      - app-network
+    volumes:
+      - redis_data:/data
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  redis_data:

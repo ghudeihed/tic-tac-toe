@@ -1,0 +1,31 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    container_name: tic-tac-toe-backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server:/app
+    environment:
+      - FLASK_ENV=development
+      - PYTHONPATH=/app
+    restart: unless-stopped
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+
+  frontend:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    container_name: tic-tac-toe-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+    restart: unless-stopped

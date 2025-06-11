@@ -1,0 +1,12 @@
+flask
+flask-cors
+flask-talisman
+flask-limiter
+marshmallow
+structlog
+gunicorn
+redis
+pytest
+pytest-cov
+sentry-sdk[flask]
+python-dotenv

@@ -1,0 +1,141 @@
+body {
+  font-family: sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+h1 {
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  gap: 10px;
+  justify-content: center;
+}
+
+.cell {
+  width: 100px;
+  height: 100px;
+  background-color: #fff;
+  border: 2px solid #ccc;
+  font-size: 2.5rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.cell:hover {
+  background-color: #e6f7ff;
+}
+
+.cell:disabled {
+  cursor: not-allowed;
+  background-color: #f0f0f0;
+}
+
+.cell.x {
+  color: #ff4d4f; /* Red for X */
+}
+
+.cell.o {
+  color: #1890ff; /* Blue for O */
+}
+
+.status {
+  font-size: 1.4rem;
+  margin-top: 1rem;
+  color: #222;
+  font-weight: 500;
+  text-align: center;
+}
+
+.new-game-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  background-color: #007bff; /* Bootstrap blue */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.new-game-btn:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+.new-game-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
+/* Error message styling */
+.error-message {
+  background-color: #fee;
+  color: #c33;
+  padding: 12px;
+  border: 1px solid #fcc;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Loading state styling */
+.status.loading {
+  color: #666;
+  font-style: italic;
+}
+
+.cell.loading {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+/* Loading animation for cells */
+.cell.loading:hover {
+  background-color: #f0f0f0;
+  transform: none;
+}
+
+/* Disable hover effects when loading */
+.board.loading .cell:hover {
+  background-color: #fff;
+  transform: none;
+}
+
+/* Button loading state */
+.new-game-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Optional: Add a subtle loading spinner */
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #333;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
