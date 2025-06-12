@@ -33,77 +33,39 @@ class TicTacToeGame:
         new_board = board.copy()
         new_board[position] = player
         return new_board
+    def minimax(self, board: List[Optional[str]], is_maximizing: bool) -> int:
+        if self.check_winner(board, self.computer_symbol):
+            return 1
+        if self.check_winner(board, self.human_symbol):
+            return -1
+        if self.is_draw(board):
+            return 0
+
+        if is_maximizing:
+            best_score = -float('inf')
+            for move in self.get_available_moves(board):
+                new_board = self.make_move(board, move, self.computer_symbol)
+                score = self.minimax(new_board, False)
+                best_score = max(score, best_score)
+            return best_score
+        else:
+            best_score = float('inf')
+            for move in self.get_available_moves(board):
+                new_board = self.make_move(board, move, self.human_symbol)
+                score = self.minimax(new_board, True)
+                best_score = min(score, best_score)
+            return best_score
     
     def get_computer_move(self, board: List[Optional[str]]) -> Optional[int]:
-        opponent = self.human_symbol
-        player = self.computer_symbol
-        available = self.get_available_moves(board)
-        
-        logger.debug(f"Computer evaluating {len(available)} available moves: {available}")
-        
-        # 1. Win
-        for move in available:
-            if self.check_winner(self.make_move(board, move, player), player):
-                logger.info(f"Computer winning game with move at position {move}")
-                return move
-        
-        # 2. Block
-        for move in available:
-            if self.check_winner(self.make_move(board, move, opponent), opponent):
-                logger.info(f"Computer blocking opponent win at position {move}")
-                return move
-        
-        # 3. Fork
-        for move in available:
-            new_board = self.make_move(board, move, player)
-            win_count = sum(
-                self.check_winner(self.make_move(new_board, m, player), player)
-                for m in self.get_available_moves(new_board)
-            )
-            if win_count >= 2:
-                logger.info(f"Computer creating fork at position {move} (creates {win_count} winning opportunities)")
-                return move
-        
-        # 4. Block Fork
-        for move in available:
-            new_board = self.make_move(board, move, opponent)
-            win_count = sum(
-                self.check_winner(self.make_move(new_board, m, opponent), opponent)
-                for m in self.get_available_moves(new_board)
-            )
-            if win_count >= 2:
-                logger.info(f"Computer blocking opponent fork at position {move}")
-                return move
-        
-        # 5. Center
-        if board[4] is None:
-            logger.info("Computer choosing center position 4")
-            return 4
-        
-        # 6. Opposite Corner
-        corners = [(0, 8), (2, 6)]
-        for a, b in corners:
-            if board[a] == opponent and board[b] is None:
-                logger.info(f"Computer choosing opposite corner {b} to opponent at {a}")
-                return b
-            if board[b] == opponent and board[a] is None:
-                logger.info(f"Computer choosing opposite corner {a} to opponent at {b}")
-                return a
-        
-        # 7. Empty Corner
-        for i in [0, 2, 6, 8]:
-            if board[i] is None:
-                logger.info(f"Computer choosing corner position {i}")
-                return i
-        
-        # 8. Empty Side
-        for i in [1, 3, 5, 7]:
-            if board[i] is None:
-                logger.info(f"Computer choosing side position {i}")
-                return i
-        
-        logger.warning("No available moves for computer")
-        return None
+        best_score = -float('inf')
+        best_move = None
+        for move in self.get_available_moves(board):
+            new_board = self.make_move(board, move, self.computer_symbol)
+            score = self.minimax(new_board, False)
+            if score > best_score:
+                best_score = score
+                best_move = move
+        return best_move
     
     def validate_move(self, board: List[Optional[str]], index: Optional[int]) -> tuple[bool, Optional[str]]:
         """Validate if a move is legal."""

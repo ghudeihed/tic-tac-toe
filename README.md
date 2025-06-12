@@ -9,7 +9,7 @@ A modern, production-ready Tic-Tac-Toe game with a React frontend and Flask back
 
 ## 🎮 Live Demo
 
-**[Play Now →](https://live-demo-url.com)**
+**[Play Now →](http://tic-tac-toe-alb-1026809040.us-east-1.elb.amazonaws.com/)**
 
 ![Game Screenshot](./docs/screenshot.png)
 
